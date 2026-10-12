@@ -3,23 +3,19 @@
 @section('content')
 <div class="page-header">
     <div>
-        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem;">
+        <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.25rem;">
             <h1 class="page-title">{{ $case->case_number }}</h1>
             @php
                 $statusSlug = strtolower(str_replace(' ', '-', $case->status));
             @endphp
-            <span class="badge badge-{{ $statusSlug }}" style="font-size: 0.85rem; padding: 0.35rem 0.75rem;">
-                {{ $case->status }}
-            </span>
-            <span class="badge badge-{{ strtolower($case->priority) }}" style="font-size: 0.85rem; padding: 0.35rem 0.75rem;">
-                {{ $case->priority }} Priority
-            </span>
+            <span class="status-pill status-{{ $statusSlug }}">{{ $case->status }}</span>
+            <span class="priority-tag priority-{{ strtolower($case->priority) }}">{{ $case->priority }} Priority</span>
         </div>
-        <p class="page-subtitle">Registered on {{ $case->created_at->format('M d, Y \a\t H:i') }}</p>
+        <p class="page-subtitle">Patient Ref: {{ $case->patient_reference }} &bull; Recorded on {{ $case->created_at->format('M d, Y') }}</p>
     </div>
 
-    <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-        <a href="{{ route('cases.index') }}" class="btn btn-secondary">&larr; Back to List</a>
+    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+        <a href="{{ route('cases.index') }}" class="btn btn-default">&larr; Back to Cases</a>
 
         @can('update', $case)
             <a href="{{ route('cases.edit', $case) }}" class="btn btn-primary" id="btn-edit-case">
@@ -28,7 +24,7 @@
         @endcan
 
         @can('delete', $case)
-            <form action="{{ route('cases.destroy', $case) }}" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete this case?');" style="display: inline;">
+            <form action="{{ route('cases.destroy', $case) }}" method="POST" onsubmit="return confirm('Permanently delete case {{ $case->case_number }}?');" style="display: inline;">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-danger" id="btn-delete-case">
@@ -39,73 +35,81 @@
     </div>
 </div>
 
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">Clinical & Surgical Details</h2>
+<div class="panel">
+    <div class="panel-header">
+        <span class="panel-title">Clinical & Surgical Details</span>
     </div>
-    <div class="card-body">
-        <div class="details-grid">
-            <div class="detail-item">
-                <span class="detail-label">Case Number</span>
-                <span class="detail-value" style="font-weight: 700; color: var(--primary);">{{ $case->case_number }}</span>
+    <div class="panel-body">
+        <div class="detail-grid">
+            <div class="detail-row">
+                <span class="detail-label">Case Identifier</span>
+                <span class="detail-value" style="font-weight: 700; color: var(--navy-primary);">
+                    {{ $case->case_number }}
+                </span>
             </div>
 
-            <div class="detail-item">
-                <span class="detail-label">Patient Reference (Dummy ID)</span>
-                <span class="detail-value">{{ $case->patient_reference }}</span>
+            <div class="detail-row">
+                <span class="detail-label">Patient Reference (Dummy Code)</span>
+                <span class="detail-value" style="font-family: monospace;">
+                    {{ $case->patient_reference }}
+                </span>
             </div>
 
-            <div class="detail-item">
+            <div class="detail-row">
                 <span class="detail-label">Lead Surgeon</span>
                 <span class="detail-value">{{ $case->surgeon_name }}</span>
             </div>
 
-            <div class="detail-item">
-                <span class="detail-label">Implant Type</span>
+            <div class="detail-row">
+                <span class="detail-label">Implant Specification</span>
                 <span class="detail-value">{{ $case->implant_type }}</span>
             </div>
 
-            <div class="detail-item">
-                <span class="detail-label">Status</span>
+            <div class="detail-row">
+                <span class="detail-label">Workflow Status</span>
                 <span class="detail-value">
-                    <span class="badge badge-{{ $statusSlug }}">{{ $case->status }}</span>
+                    <span class="status-pill status-{{ $statusSlug }}">{{ $case->status }}</span>
                 </span>
             </div>
 
-            <div class="detail-item">
-                <span class="detail-label">Priority</span>
+            <div class="detail-row">
+                <span class="detail-label">Priority Level</span>
                 <span class="detail-value">
-                    <span class="badge badge-{{ strtolower($case->priority) }}">{{ $case->priority }}</span>
+                    <span class="priority-tag priority-{{ strtolower($case->priority) }}">{{ $case->priority }}</span>
                 </span>
             </div>
 
-            <div class="detail-item">
+            <div class="detail-row">
                 <span class="detail-label">Scheduled Surgery Date</span>
                 <span class="detail-value">
-                    {{ $case->surgery_date ? $case->surgery_date->format('F d, Y') : 'Not scheduled yet' }}
+                    {{ $case->surgery_date ? $case->surgery_date->format('F d, Y') : 'Not scheduled' }}
                 </span>
             </div>
 
-            <div class="detail-item">
-                <span class="detail-label">Created By</span>
+            <div class="detail-row">
+                <span class="detail-label">Registered By</span>
                 <span class="detail-value">
                     {{ $case->creator ? $case->creator->name : 'System' }}
                     @if ($case->creator)
-                        <span class="role-badge {{ $case->creator->role }}" style="margin-left: 0.35rem;">
+                        <span class="role-tag {{ $case->creator->role }}" style="margin-left: 0.35rem;">
                             {{ $case->creator->role }}
                         </span>
                     @endif
                 </span>
             </div>
 
-            <div class="detail-item">
-                <span class="detail-label">Record Created At</span>
-                <span class="detail-value">{{ $case->created_at->format('Y-m-d H:i:s') }}</span>
+            <div class="detail-row">
+                <span class="detail-label">Created At</span>
+                <span class="detail-value" style="font-size: 0.85rem; color: var(--text-secondary);">
+                    {{ $case->created_at->format('Y-m-d H:i:s') }}
+                </span>
             </div>
 
-            <div class="detail-item">
+            <div class="detail-row">
                 <span class="detail-label">Last Updated At</span>
-                <span class="detail-value">{{ $case->updated_at->format('Y-m-d H:i:s') }}</span>
+                <span class="detail-value" style="font-size: 0.85rem; color: var(--text-secondary);">
+                    {{ $case->updated_at->format('Y-m-d H:i:s') }}
+                </span>
             </div>
         </div>
     </div>

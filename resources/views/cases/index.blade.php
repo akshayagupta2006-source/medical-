@@ -1,29 +1,28 @@
-@extends('layouts.app', ['title' => 'Medical Cases'])
+@extends('layouts.app', ['title' => 'Cases List'])
 
 @section('content')
 <div class="page-header">
     <div>
-        <h1 class="page-title">Medical Cases</h1>
-        <p class="page-subtitle">Manage surgical cases, implant requisitions, and case statuses</p>
+        <h1 class="page-title">Medical Cases Registry</h1>
+        <p class="page-subtitle">Primary register of patient case files, surgical plans, and implant requisitions</p>
     </div>
 
     @can('create', App\Models\MedicalCase::class)
-        <a href="{{ route('cases.create') }}" class="btn btn-primary" id="btn-create-case-list">
-            <span>+</span>
-            <span>New Case</span>
+        <a href="{{ route('cases.create') }}" class="btn btn-teal" id="btn-create-case-list">
+            + New Case
         </a>
     @endcan
 </div>
 
-<!-- Search & Status Filter Bar -->
-<div class="filter-bar">
-    <form action="{{ route('cases.index') }}" method="GET" class="filter-form">
+<!-- Search & Filter Toolbar -->
+<div class="toolbar">
+    <form action="{{ route('cases.index') }}" method="GET" class="toolbar-form">
         <div style="flex: 1; min-width: 220px;">
             <input
                 type="text"
                 name="search"
                 class="form-control"
-                placeholder="Search by Case # or Surgeon..."
+                placeholder="Search case # or surgeon..."
                 value="{{ $searchQuery }}"
                 id="search-input"
             >
@@ -43,95 +42,104 @@
             </select>
         </div>
 
-        <button type="submit" class="btn btn-secondary" id="btn-filter">
+        <button type="submit" class="btn btn-primary" id="btn-filter">
             Filter
         </button>
 
         @if ($searchQuery || $selectedStatus)
-            <a href="{{ route('cases.index') }}" class="btn btn-secondary" style="color: var(--text-muted);">
-                Reset
+            <a href="{{ route('cases.index') }}" class="btn btn-default">
+                Clear
             </a>
         @endif
     </form>
 </div>
 
-<!-- Cases Table -->
-<div class="card">
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
+<!-- Cases Table (Main Focus) -->
+<div class="table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width: 120px;">Case #</th>
+                <th>Patient Ref</th>
+                <th>Surgeon</th>
+                <th>Implant Type</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Surgery Date</th>
+                <th>Created By</th>
+                <th style="text-align: right; width: 180px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($cases as $case)
                 <tr>
-                    <th>Case #</th>
-                    <th>Patient Ref</th>
-                    <th>Surgeon</th>
-                    <th>Implant Type</th>
-                    <th>Status</th>
-                    <th>Priority</th>
-                    <th>Surgery Date</th>
-                    <th>Created By</th>
-                    <th style="text-align: right;">Actions</th>
+                    <td style="font-weight: 600;">
+                        <a href="{{ route('cases.show', $case) }}" style="color: var(--navy-primary); text-decoration: none;">
+                            {{ $case->case_number }}
+                        </a>
+                    </td>
+                    <td>
+                        <span style="font-family: monospace; font-size: 0.85rem; color: var(--text-secondary);">
+                            {{ $case->patient_reference }}
+                        </span>
+                    </td>
+                    <td>{{ $case->surgeon_name }}</td>
+                    <td>{{ $case->implant_type }}</td>
+                    <td>
+                        @php
+                            $statusSlug = strtolower(str_replace(' ', '-', $case->status));
+                        @endphp
+                        <span class="status-pill status-{{ $statusSlug }}">{{ $case->status }}</span>
+                    </td>
+                    <td>
+                        <span class="priority-tag priority-{{ strtolower($case->priority) }}">{{ $case->priority }}</span>
+                    </td>
+                    <td>{{ $case->surgery_date ? $case->surgery_date->format('M d, Y') : '—' }}</td>
+                    <td>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">
+                            {{ $case->creator ? $case->creator->name : 'System' }}
+                        </span>
+                    </td>
+                    <td style="text-align: right; white-space: nowrap;">
+                        <a href="{{ route('cases.show', $case) }}" class="btn btn-default btn-sm">
+                            View
+                        </a>
+
+                        @can('update', $case)
+                            <a href="{{ route('cases.edit', $case) }}" class="btn btn-default btn-sm" style="color: var(--navy-primary);">
+                                Edit
+                            </a>
+                        @endcan
+
+                        @can('delete', $case)
+                            <form action="{{ route('cases.destroy', $case) }}" method="POST" onsubmit="return confirm('Delete case {{ $case->case_number }}?');" style="display: inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    Delete
+                                </button>
+                            </form>
+                        @endcan
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @forelse ($cases as $case)
-                    <tr>
-                        <td style="font-weight: 600;">
-                            <a href="{{ route('cases.show', $case) }}" style="color: var(--primary); text-decoration: none;">
-                                {{ $case->case_number }}
-                            </a>
-                        </td>
-                        <td>{{ $case->patient_reference }}</td>
-                        <td>{{ $case->surgeon_name }}</td>
-                        <td>{{ $case->implant_type }}</td>
-                        <td>
-                            @php
-                                $statusSlug = strtolower(str_replace(' ', '-', $case->status));
-                            @endphp
-                            <span class="badge badge-{{ $statusSlug }}">{{ $case->status }}</span>
-                        </td>
-                        <td>
-                            <span class="badge badge-{{ strtolower($case->priority) }}">{{ $case->priority }}</span>
-                        </td>
-                        <td>{{ $case->surgery_date ? $case->surgery_date->format('M d, Y') : '—' }}</td>
-                        <td>
-                            <small>{{ $case->creator ? $case->creator->name : 'System' }}</small>
-                        </td>
-                        <td style="text-align: right; white-space: nowrap;">
-                            <a href="{{ route('cases.show', $case) }}" class="btn btn-secondary btn-sm">
-                                View
-                            </a>
-
-                            @can('update', $case)
-                                <a href="{{ route('cases.edit', $case) }}" class="btn btn-secondary btn-sm" style="color: var(--primary);">
-                                    Edit
-                                </a>
-                            @endcan
-
-                            @can('delete', $case)
-                                <form action="{{ route('cases.destroy', $case) }}" method="POST" onsubmit="return confirm('Delete this case?');" style="display: inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--danger);">
-                                        Delete
-                                    </button>
-                                </form>
-                            @endcan
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="9" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
-                            No medical cases matched your criteria.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+            @empty
+                <tr>
+                    <td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                        No medical cases found matching your search criteria.
+                    </td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
 </div>
 
-<!-- Pagination Links -->
-<div class="pagination-wrapper">
-    {{ $cases->links() }}
+<!-- Pagination -->
+<div class="pagination-container">
+    <div style="color: var(--text-muted); font-size: 0.8rem;">
+        Showing {{ $cases->firstItem() ?? 0 }} to {{ $cases->lastItem() ?? 0 }} of {{ $cases->total() }} cases
+    </div>
+    <div>
+        {{ $cases->links() }}
+    </div>
 </div>
 @endsection

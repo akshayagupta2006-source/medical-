@@ -4,16 +4,16 @@
 <div class="page-header">
     <div>
         <h1 class="page-title">Create Medical Case</h1>
-        <p class="page-subtitle">Register a new orthopedic or surgical case</p>
+        <p class="page-subtitle">Register a new orthopedic or surgical case in the system</p>
     </div>
-    <a href="{{ route('cases.index') }}" class="btn btn-secondary">&larr; Back to Cases</a>
+    <a href="{{ route('cases.index') }}" class="btn btn-default">&larr; Back to Cases</a>
 </div>
 
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">Case Information</h2>
+<div class="panel">
+    <div class="panel-header">
+        <span class="panel-title">Case Information</span>
     </div>
-    <div class="card-body">
+    <div class="panel-body">
         <form action="{{ route('cases.store') }}" method="POST">
             @include('cases._form', ['isEdit' => false])
         </form>

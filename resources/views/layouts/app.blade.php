@@ -4,57 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'Medical Case Management' }} - Jajal Medical</title>
+    <title>{{ $title ?? 'Case Management' }} - Jajal Medical</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
 <body>
-    <nav class="navbar">
+    <header class="navbar">
         <div class="navbar-container">
-            <a href="{{ route('dashboard') }}" class="brand">
-                <span class="brand-icon">+</span>
-                <span>Jajal Medical</span>
+            <a href="{{ route('dashboard') }}" class="navbar-brand">
+                <span class="brand-badge">Medical</span>
+                <span>Jajal Case Management</span>
             </a>
 
             @auth
-            <div class="nav-links">
+            <nav class="nav-menu">
                 <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
                 <a href="{{ route('cases.index') }}" class="nav-link {{ request()->routeIs('cases.*') ? 'active' : '' }}">Cases</a>
-            </div>
+            </nav>
 
-            <div class="user-nav">
-                <span class="role-badge {{ auth()->user()->role }}">
+            <div class="user-section">
+                <span class="role-tag {{ auth()->user()->role }}">
                     {{ auth()->user()->role }}
                 </span>
-                <span style="font-weight: 500; font-size: 0.9rem;">{{ auth()->user()->name }}</span>
+                <span class="user-name">{{ auth()->user()->name }}</span>
                 <form action="{{ route('logout') }}" method="POST" style="display: inline;">
                     @csrf
-                    <button type="submit" class="btn btn-secondary btn-sm" id="logout-btn">Logout</button>
+                    <button type="submit" class="btn btn-default btn-sm" id="logout-btn">Logout</button>
                 </form>
             </div>
             @endauth
         </div>
-    </nav>
+    </header>
 
-    <main class="main-container">
+    <main class="page-container">
         @if (session('status'))
             <div class="alert alert-success" role="alert">
-                <span>✓</span>
+                <strong>✓</strong>
                 <span>{{ session('status') }}</span>
             </div>
         @endif
 
         @if ($errors->any() && !request()->routeIs('login'))
             <div class="alert alert-danger" role="alert">
-                <span>⚠️</span>
-                <span>Please correct the errors in the form below.</span>
+                <strong>Notice:</strong>
+                <span>Please review and correct the errors below before submitting.</span>
             </div>
         @endif
 
         @yield('content')
     </main>
 
-    <footer class="footer">
-        <p>&copy; {{ date('Y') }} Jajal Medical - Medical Case Management System. All rights reserved.</p>
+    <footer class="app-footer">
+        <p>Jajal Medical &bull; Case Management System &bull; Practical Implementation</p>
     </footer>
 </body>
 </html>

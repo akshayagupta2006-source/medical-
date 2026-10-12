@@ -1,21 +1,19 @@
-@extends('layouts.app', ['title' => 'Edit Case: ' . $case->case_number])
+@extends('layouts.app', ['title' => 'Edit Case ' . $case->case_number])
 
 @section('content')
 <div class="page-header">
     <div>
         <h1 class="page-title">Edit Case: {{ $case->case_number }}</h1>
-        <p class="page-subtitle">Update case details, priority, or clinical status</p>
+        <p class="page-subtitle">Update clinical information, workflow status, or priority</p>
     </div>
-    <div style="display: flex; gap: 0.5rem;">
-        <a href="{{ route('cases.show', $case) }}" class="btn btn-secondary">&larr; Back to Case Details</a>
-    </div>
+    <a href="{{ route('cases.show', $case) }}" class="btn btn-default">&larr; Back to Case Details</a>
 </div>
 
-<div class="card">
-    <div class="card-header">
-        <h2 class="card-title">Modify Case Information</h2>
+<div class="panel">
+    <div class="panel-header">
+        <span class="panel-title">Update Case Information</span>
     </div>
-    <div class="card-body">
+    <div class="panel-body">
         <form action="{{ route('cases.update', $case) }}" method="POST">
             @include('cases._form', ['isEdit' => true])
         </form>

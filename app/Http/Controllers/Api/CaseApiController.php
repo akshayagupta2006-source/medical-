@@ -53,6 +53,14 @@ class CaseApiController extends Controller
      */
     public function store(StoreMedicalCaseRequest $request): JsonResponse
     {
+        if (! $request->user()->can('create', MedicalCase::class)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This action is unauthorized.',
+                'data' => null,
+            ], 403);
+        }
+
         $validated = $request->validated();
         $validated['created_by'] = $request->user()->id;
 

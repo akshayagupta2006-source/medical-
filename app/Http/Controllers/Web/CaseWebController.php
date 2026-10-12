@@ -63,6 +63,8 @@ class CaseWebController extends Controller
      */
     public function store(StoreMedicalCaseRequest $request): RedirectResponse
     {
+        Gate::authorize('create', MedicalCase::class);
+
         $validated = $request->validated();
         $validated['created_by'] = $request->user()->id;
 

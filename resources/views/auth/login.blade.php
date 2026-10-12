@@ -4,8 +4,7 @@
 <div class="auth-container">
     <div class="auth-box">
         <div class="auth-header">
-            <span class="brand-badge" style="margin-bottom: 0.5rem; display: inline-block;">Jajal Medical</span>
-            <h1>Case Management Portal</h1>
+            <h1>Sign In</h1>
             <p>Please enter your credentials to access the system</p>
         </div>
 
@@ -62,14 +61,14 @@
             </button>
         </form>
 
-        <div class="demo-credentials">
-            <div class="demo-title">Test Accounts (Click to auto-fill)</div>
-            <div class="demo-buttons">
-                <button type="button" class="btn btn-default btn-sm" onclick="fillCredentials('admin@jajalmedical.com', 'Password123!')">
-                    Admin User
+        <div class="demo-credentials-compact">
+            <span class="demo-label">Demo Quick Fill:</span>
+            <div class="demo-actions">
+                <button type="button" class="demo-btn" onclick="fillCredentials('admin@jajalmedical.com', 'Password123!')">
+                    Admin
                 </button>
-                <button type="button" class="btn btn-default btn-sm" onclick="fillCredentials('viewer@jajalmedical.com', 'Password123!')">
-                    Viewer User
+                <button type="button" class="demo-btn" onclick="fillCredentials('viewer@jajalmedical.com', 'Password123!')">
+                    Viewer
                 </button>
             </div>
         </div>
